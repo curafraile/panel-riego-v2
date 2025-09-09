@@ -8,14 +8,16 @@
   <style>
     body { font-family: sans-serif; text-align: center; padding: 2em; background: #f0f0f0; }
     h1 { color: #2c3e50; }
-    .dato { font-size: 2em; margin: 1em 0; }
+    .dato { font-size: 2em; margin: 1em 0; padding: 0.5em; border-radius: 10px; display: inline-block; }
+    .riego { margin-top: 1em; font-weight: bold; color: #2980b9; }
     button { padding: 1em 2em; font-size: 1em; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; }
     button:hover { background: #219150; }
   </style>
 </head>
 <body>
   <h1>🌱 Panel de Riego</h1>
-  <div class="dato">Humedad actual: <span id="humedad">--</span>%</div>
+  <div id="humedadBox" class="dato">Humedad actual: <span id="humedad">--</span>%</div>
+  <div class="riego">Estado de riego: <span id="estadoRiego">--</span></div>
   <button onclick="activarRiego()">Activar riego</button>
 
   <script>
@@ -32,11 +34,30 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // Lectura de humedad
     db.ref("riego/humedad").on("value", snapshot => {
       const valor = snapshot.val();
-      document.getElementById("humedad").textContent = valor ?? "--";
+      const humedad = document.getElementById("humedad");
+      const box = document.getElementById("humedadBox");
+      humedad.textContent = valor ?? "--";
+
+      // Trazabilidad visual por color
+      if (valor < 30) {
+        box.style.background = "#e74c3c"; // rojo: seco
+      } else if (valor < 60) {
+        box.style.background = "#f1c40f"; // amarillo: intermedio
+      } else {
+        box.style.background = "#2ecc71"; // verde: húmedo
+      }
     });
 
+    // Lectura del estado de riego
+    db.ref("riego/bomba").on("value", snapshot => {
+      const estado = snapshot.val();
+      document.getElementById("estadoRiego").textContent = estado ?? "--";
+    });
+
+    // Activación remota
     function activarRiego() {
       db.ref("riego/bomba").set("ON");
       alert("💧 Riego activado");
