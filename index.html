@@ -1,5 +1,46 @@
 <!DOCTYPE html>
 <html>
-  <head><meta charset="UTF-8"><title>Panel</title></head>
-  <body><h1>Panel de Riego funcionando</h1></body>
+<head>
+  <meta charset="UTF-8">
+  <title>Panel de Riego</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 2em; background: #f0f0f0; }
+    h1 { color: #2c3e50; }
+    .dato { font-size: 2em; margin: 1em 0; }
+    button { padding: 1em 2em; font-size: 1em; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #219150; }
+  </style>
+</head>
+<body>
+  <h1>🌱 Panel de Riego</h1>
+  <div class="dato">Humedad actual: <span id="humedad">--</span>%</div>
+  <button onclick="activarRiego()">Activar riego</button>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "TU_API_KEY",
+      authDomain: "TU_DOMINIO.firebaseapp.com",
+      databaseURL: "https://TU_DOMINIO-default-rtdb.firebaseio.com",
+      projectId: "TU_DOMINIO",
+      storageBucket: "TU_DOMINIO.appspot.com",
+      messagingSenderId: "TU_ID",
+      appId: "TU_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    db.ref("sensor/humedad").on("value", snapshot => {
+      const valor = snapshot.val();
+      document.getElementById("humedad").textContent = valor ?? "--";
+    });
+
+    function activarRiego() {
+      db.ref("actuador/riego").set("ON");
+      alert("💧 Riego activado");
+    }
+  </script>
+</body>
 </html>
