@@ -19,15 +19,17 @@
   <button onclick="activarRiego()">Activar riego</button>
 
   <script>
-    const firebaseConfig = {
-      apiKey: "TU_API_KEY",
-      authDomain: "TU_DOMINIO.firebaseapp.com",
-      databaseURL: "https://TU_DOMINIO-default-rtdb.firebaseio.com",
-      projectId: "TU_DOMINIO",
-      storageBucket: "TU_DOMINIO.appspot.com",
-      messagingSenderId: "TU_ID",
-      appId: "TU_APP_ID"
-    };
+   const firebaseConfig = {
+  apiKey: "AIzaSyAzXHzQBJHt60kQ14X4a7OZ3fJVdoHGBk8",
+  authDomain: "riego-hibrido.firebaseapp.com",
+  databaseURL: "https://riego-hibrido-default-rtdb.firebaseio.com",
+  projectId: "riego-hibrido",
+  storageBucket: "riego-hibrido.firebasestorage.app",
+  messagingSenderId: "283637108482",
+  appId: "1:283637108482:web:7acc8ccb8b188087cd7c1b"
+};
+
+
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
