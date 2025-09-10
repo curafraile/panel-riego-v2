@@ -85,9 +85,13 @@
       document.getElementById("estadoRiego").textContent = snapshot.val() ?? "--";
     });
 
-    db.ref("riego/origen").on("value", snapshot => {
-      document.getElementById("origenRiego").textContent = snapshot.val() ?? "--";
-    });
+  db.ref("riego/bomba").on("value", snapshot => {
+  const estado = snapshot.val();
+  const texto = (estado === "ON") ? "Activada" :
+                (estado === "OFF") ? "Desactivada" : "--";
+  document.getElementById("estadoRiego").textContent = texto;
+});
+
 
     function activarRiego() {
       db.ref("riego/bomba").set("ON");
