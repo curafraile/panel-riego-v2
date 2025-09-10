@@ -9,7 +9,7 @@
     body { font-family: sans-serif; text-align: center; padding: 2em; background: #f0f0f0; }
     h1 { color: #2c3e50; }
     .dato { font-size: 2em; margin: 1em 0; padding: 0.5em; border-radius: 10px; display: inline-block; }
-    .riego { margin-top: 1em; font-weight: bold; color: #2980b9; }
+    .riego, .origen { margin-top: 1em; font-weight: bold; color: #2980b9; }
     button { padding: 1em 2em; font-size: 1em; margin: 0.5em; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; }
     button:hover { background: #219150; }
     .off { background: #c0392b; }
@@ -20,6 +20,7 @@
   <h1>🌱 Panel de Riego</h1>
   <div id="humedadBox" class="dato">Humedad actual: <span id="humedad">--</span>%</div>
   <div class="riego">Estado de riego: <span id="estadoRiego">--</span></div>
+  <div class="origen">Origen del cambio: <span id="origenRiego">--</span></div>
   <button onclick="activarRiego()">Activar riego</button>
   <button class="off" onclick="desactivarRiego()">Desactivar riego</button>
 
@@ -57,6 +58,12 @@
     db.ref("riego/bomba").on("value", snapshot => {
       const estado = snapshot.val();
       document.getElementById("estadoRiego").textContent = estado ?? "--";
+    });
+
+    // Lectura del origen
+    db.ref("riego/origen").on("value", snapshot => {
+      const origen = snapshot.val();
+      document.getElementById("origenRiego").textContent = origen ?? "--";
     });
 
     // Activación manual
