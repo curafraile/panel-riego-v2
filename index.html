@@ -29,7 +29,7 @@
       authDomain: "riego-hibrido.firebaseapp.com",
       databaseURL: "https://riego-hibrido-default-rtdb.firebaseio.com",
       projectId: "riego-hibrido",
-      storageBucket: "riego-hibrido.firebasestorage.app",
+      storageBucket: "riego-hibrido.appspot.com",
       messagingSenderId: "283637108482",
       appId: "1:283637108482:web:7acc8ccb8b188087cd7c1b"
     };
@@ -62,13 +62,15 @@
     // Activación remota
     function activarRiego() {
       db.ref("riego/bomba").set("ON");
-      alert("💧 Riego activado");
+      db.ref("riego/origen").set("manual");
+      alert("💧 Riego activado manualmente");
     }
 
     // Desactivación remota
     function desactivarRiego() {
       db.ref("riego/bomba").set("OFF");
-      alert("🛑 Riego desactivado");
+      db.ref("riego/origen").set("manual");
+      alert("🛑 Riego desactivado manualmente");
     }
   </script>
 </body>
