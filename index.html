@@ -10,8 +10,10 @@
     h1 { color: #2c3e50; }
     .dato { font-size: 2em; margin: 1em 0; padding: 0.5em; border-radius: 10px; display: inline-block; }
     .riego { margin-top: 1em; font-weight: bold; color: #2980b9; }
-    button { padding: 1em 2em; font-size: 1em; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button { padding: 1em 2em; font-size: 1em; margin: 0.5em; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; }
     button:hover { background: #219150; }
+    .off { background: #c0392b; }
+    .off:hover { background: #a93226; }
   </style>
 </head>
 <body>
@@ -19,6 +21,7 @@
   <div id="humedadBox" class="dato">Humedad actual: <span id="humedad">--</span>%</div>
   <div class="riego">Estado de riego: <span id="estadoRiego">--</span></div>
   <button onclick="activarRiego()">Activar riego</button>
+  <button class="off" onclick="desactivarRiego()">Desactivar riego</button>
 
   <script>
     const firebaseConfig = {
@@ -41,7 +44,6 @@
       const box = document.getElementById("humedadBox");
       humedad.textContent = valor ?? "--";
 
-      // Trazabilidad visual por color
       if (valor < 30) {
         box.style.background = "#e74c3c"; // rojo: seco
       } else if (valor < 60) {
@@ -61,6 +63,12 @@
     function activarRiego() {
       db.ref("riego/bomba").set("ON");
       alert("💧 Riego activado");
+    }
+
+    // Desactivación remota
+    function desactivarRiego() {
+      db.ref("riego/bomba").set("OFF");
+      alert("🛑 Riego desactivado");
     }
   </script>
 </body>
