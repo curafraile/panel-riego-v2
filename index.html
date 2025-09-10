@@ -80,22 +80,22 @@
       else if (valor < 60) box.style.background = "#f1c40f";
       else box.style.background = "#2ecc71";
     });
-db.ref("riego/bomba").on("value", snapshot => {
-  const estado = snapshot.val();
-  const texto = (estado === "ON") ? "Activada" :
-                (estado === "OFF") ? "Desactivada" : "--";
-  document.getElementById("estadoRiego").textContent = texto;
-});
 
-    
+    db.ref("riego/bomba").on("value", snapshot => {
+      const estado = snapshot.val();
+      let texto = "--";
+      if (estado === "ON") texto = "💧 Activada";
+      else if (estado === "OFF") texto = "🛑 Desactivada";
+      document.getElementById("estadoRiego").textContent = texto;
+    });
 
-  db.ref("riego/bomba").on("value", snapshot => {
-  const estado = snapshot.val();
-  const texto = (estado === "ON") ? "Activada" :
-                (estado === "OFF") ? "Desactivada" : "--";
-  document.getElementById("estadoRiego").textContent = texto;
-});
-
+    db.ref("riego/origen").on("value", snapshot => {
+      const origen = snapshot.val();
+      let texto = "--";
+      if (origen === "auto") texto = "🔄 Automático";
+      else if (origen === "manual") texto = "🧑‍🔧 Manual";
+      document.getElementById("origenRiego").textContent = texto;
+    });
 
     function activarRiego() {
       db.ref("riego/bomba").set("ON");
