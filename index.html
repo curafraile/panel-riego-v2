@@ -5,6 +5,7 @@
   <title>Panel de Riego</title>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body { font-family: sans-serif; text-align: center; padding: 2em; background: #f0f0f0; }
     h1 { color: #2c3e50; }
@@ -16,6 +17,7 @@
     .off { background: #c0392b; }
     .auto { background: #3498db; }
     .manual { background: #8e44ad; }
+    canvas { margin-top: 2em; }
   </style>
 </head>
 <body>
@@ -27,6 +29,8 @@
   <button class="off" onclick="desactivarRiego()">Desactivar riego</button>
   <button class="auto" onclick="activarAutomatico()">Modo automático</button>
   <button class="manual" onclick="activarManual()">Modo manual</button>
+
+  <canvas id="graficoHumedad" width="400" height="200"></canvas>
 
   <script>
     const firebaseConfig = {
@@ -95,6 +99,45 @@
       db.ref("riego/origen").set("manual");
       alert("🧑‍🔧 Modo manual activado");
     }
+
+    // Gráfico de humedad en tiempo real
+    const ctx = document.getElementById("graficoHumedad").getContext("2d");
+    const grafico = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: [],
+        datasets: [{
+          label: "Humedad (%)",
+          data: [],
+          borderColor: "#27ae60",
+          backgroundColor: "rgba(39,174,96,0.2)",
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      options: {
+        scales: {
+          x: { title: { display: true, text: "Hora" } },
+          y: { min: 0, max: 100, title: { display: true, text: "Humedad (%)" } }
+        }
+      }
+    });
+
+    db.ref("riego/log").on("value", snapshot => {
+      const datos = snapshot.val();
+      const etiquetas = [];
+      const valores = [];
+
+      for (const timestamp in datos) {
+        const fecha = new Date(parseInt(timestamp));
+        etiquetas.push(fecha.toLocaleTimeString());
+        valores.push(datos[timestamp]);
+      }
+
+      grafico.data.labels = etiquetas;
+      grafico.data.datasets[0].data = valores;
+      grafico.update();
+    });
   </script>
 </body>
 </html>
