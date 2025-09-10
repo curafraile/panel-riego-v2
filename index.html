@@ -11,7 +11,8 @@
     h1 { color: #2c3e50; }
     .dato { font-size: 2em; margin: 1em 0; padding: 0.5em; border-radius: 10px; display: inline-block; }
     .riego, .origen { margin-top: 1em; font-weight: bold; color: #2980b9; }
-    button { padding: 1em 2em; font-size: 1em; margin: 0.5em; border: none; border-radius: 5px; cursor: pointer; color: white; }
+    button, select { padding: 0.5em 1em; font-size: 1em; margin: 0.5em; border-radius: 5px; }
+    button { border: none; cursor: pointer; color: white; }
     button:hover { opacity: 0.9; }
     .on { background: #27ae60; }
     .off { background: #c0392b; }
@@ -29,6 +30,29 @@
   <button class="off" onclick="desactivarRiego()">Desactivar riego</button>
   <button class="auto" onclick="activarAutomatico()">Modo automático</button>
   <button class="manual" onclick="activarManual()">Modo manual</button>
+
+  <div>
+    <h3>📅 Consultar historial</h3>
+    <select id="mes">
+      <option value="1">Enero</option>
+      <option value="2">Febrero</option>
+      <option value="3">Marzo</option>
+      <option value="4">Abril</option>
+      <option value="5">Mayo</option>
+      <option value="6">Junio</option>
+      <option value="7">Julio</option>
+      <option value="8">Agosto</option>
+      <option value="9" selected>Septiembre</option>
+      <option value="10">Octubre</option>
+      <option value="11">Noviembre</option>
+      <option value="12">Diciembre</option>
+    </select>
+    <select id="anio">
+      <option value="2024">2024</option>
+      <option value="2025" selected>2025</option>
+    </select>
+    <button onclick="cargarHistorial()">Ver historial</button>
+  </div>
 
   <canvas id="graficoHumedad" width="400" height="200"></canvas>
 
@@ -109,26 +133,57 @@
       }
     });
 
-    const hoy = new Date();
-    const año = hoy.getFullYear();
-    const mes = String(hoy.getMonth() + 1);
+    function cargarUltimaSemana() {
+      const hoy = new Date();
+      const año = hoy.getFullYear();
+      const mes = hoy.getMonth() + 1;
+      const diaActual = hoy.getDate();
+      const diasVisibles = 7;
 
-    db.ref(`riego/historial/${año}/${mes}`).on("value", snapshot => {
-      const datos = snapshot.val();
-      const etiquetas = [];
-      const valores = [];
+      db.ref(`riego/historial/${año}/${mes}`).on("value", snapshot => {
+        const datos = snapshot.val();
+        const etiquetas = [];
+        const valores = [];
 
-      for (const dia in datos) {
-        for (const hora in datos[dia]) {
-          etiquetas.push(`${dia}/${mes} ${hora}`);
-          valores.push(datos[dia][hora]);
+        for (const dia in datos) {
+          const diaNum = parseInt(dia);
+          if (diaNum >= diaActual - diasVisibles && diaNum <= diaActual) {
+            for (const hora in datos[dia]) {
+              etiquetas.push(`${dia}/${mes} ${hora}`);
+              valores.push(datos[dia][hora]);
+            }
+          }
         }
-      }
 
-      grafico.data.labels = etiquetas;
-      grafico.data.datasets[0].data = valores;
-      grafico.update();
-    });
+        grafico.data.labels = etiquetas;
+        grafico.data.datasets[0].data = valores;
+        grafico.update();
+      });
+    }
+
+    function cargarHistorial() {
+      const mes = document.getElementById("mes").value;
+      const anio = document.getElementById("anio").value;
+
+      db.ref(`riego/historial/${anio}/${mes}`).once("value").then(snapshot => {
+        const datos = snapshot.val();
+        const etiquetas = [];
+        const valores = [];
+
+        for (const dia in datos) {
+          for (const hora in datos[dia]) {
+            etiquetas.push(`${dia}/${mes} ${hora}`);
+            valores.push(datos[dia][hora]);
+          }
+        }
+
+        grafico.data.labels = etiquetas;
+        grafico.data.datasets[0].data = valores;
+        grafico.update();
+      });
+    }
+
+    cargarUltimaSemana(); // Carga inicial
   </script>
 </body>
 </html>
