@@ -80,10 +80,14 @@
       else if (valor < 60) box.style.background = "#f1c40f";
       else box.style.background = "#2ecc71";
     });
+db.ref("riego/bomba").on("value", snapshot => {
+  const estado = snapshot.val();
+  const texto = (estado === "ON") ? "Activada" :
+                (estado === "OFF") ? "Desactivada" : "--";
+  document.getElementById("estadoRiego").textContent = texto;
+});
 
-    db.ref("riego/bomba").on("value", snapshot => {
-      document.getElementById("estadoRiego").textContent = snapshot.val() ?? "--";
-    });
+    
 
   db.ref("riego/bomba").on("value", snapshot => {
   const estado = snapshot.val();
