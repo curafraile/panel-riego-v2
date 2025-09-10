@@ -46,61 +46,47 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Lectura de humedad
     db.ref("riego/humedad").on("value", snapshot => {
       const valor = snapshot.val();
       const humedad = document.getElementById("humedad");
       const box = document.getElementById("humedadBox");
       humedad.textContent = valor ?? "--";
 
-      if (valor < 30) {
-        box.style.background = "#e74c3c"; // rojo: seco
-      } else if (valor < 60) {
-        box.style.background = "#f1c40f"; // amarillo: intermedio
-      } else {
-        box.style.background = "#2ecc71"; // verde: húmedo
-      }
+      if (valor < 30) box.style.background = "#e74c3c";
+      else if (valor < 60) box.style.background = "#f1c40f";
+      else box.style.background = "#2ecc71";
     });
 
-    // Lectura del estado de riego
     db.ref("riego/bomba").on("value", snapshot => {
-      const estado = snapshot.val();
-      document.getElementById("estadoRiego").textContent = estado ?? "--";
+      document.getElementById("estadoRiego").textContent = snapshot.val() ?? "--";
     });
 
-    // Lectura del origen
     db.ref("riego/origen").on("value", snapshot => {
-      const origen = snapshot.val();
-      document.getElementById("origenRiego").textContent = origen ?? "--";
+      document.getElementById("origenRiego").textContent = snapshot.val() ?? "--";
     });
 
-    // Activación manual
     function activarRiego() {
       db.ref("riego/bomba").set("ON");
       db.ref("riego/origen").set("manual");
       alert("💧 Riego activado manualmente");
     }
 
-    // Desactivación manual
     function desactivarRiego() {
       db.ref("riego/bomba").set("OFF");
       db.ref("riego/origen").set("manual");
       alert("🛑 Riego desactivado manualmente");
     }
 
-    // Activación de modo automático
     function activarAutomatico() {
       db.ref("riego/origen").set("auto");
       alert("🔄 Modo automático activado");
     }
 
-    // Activación de modo manual sin cambiar bomba
     function activarManual() {
       db.ref("riego/origen").set("manual");
       alert("🧑‍🔧 Modo manual activado");
     }
 
-    // Gráfico de humedad en tiempo real
     const ctx = document.getElementById("graficoHumedad").getContext("2d");
     const grafico = new Chart(ctx, {
       type: "line",
@@ -117,21 +103,26 @@
       },
       options: {
         scales: {
-          x: { title: { display: true, text: "Hora" } },
+          x: { title: { display: true, text: "Fecha y hora" } },
           y: { min: 0, max: 100, title: { display: true, text: "Humedad (%)" } }
         }
       }
     });
 
-    db.ref("riego/log").on("value", snapshot => {
+    const hoy = new Date();
+    const año = hoy.getFullYear();
+    const mes = String(hoy.getMonth() + 1);
+
+    db.ref(`riego/historial/${año}/${mes}`).on("value", snapshot => {
       const datos = snapshot.val();
       const etiquetas = [];
       const valores = [];
 
-      for (const timestamp in datos) {
-        const fecha = new Date(parseInt(timestamp));
-        etiquetas.push(fecha.toLocaleTimeString());
-        valores.push(datos[timestamp]);
+      for (const dia in datos) {
+        for (const hora in datos[dia]) {
+          etiquetas.push(`${dia}/${mes} ${hora}`);
+          valores.push(datos[dia][hora]);
+        }
       }
 
       grafico.data.labels = etiquetas;
