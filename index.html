@@ -59,17 +59,17 @@
       document.getElementById("estadoRiego").textContent = estado ?? "--";
     });
 
-    // Activación remota
+    // Activación manual
     function activarRiego() {
       db.ref("riego/bomba").set("ON");
       db.ref("riego/origen").set("manual");
       alert("💧 Riego activado manualmente");
     }
 
-    // Desactivación remota
+    // Desactivación manual con liberación de control
     function desactivarRiego() {
       db.ref("riego/bomba").set("OFF");
-      db.ref("riego/origen").set("manual");
+      db.ref("riego/origen").set("auto"); // permite reactivación automática
       alert("🛑 Riego desactivado manualmente");
     }
   </script>
